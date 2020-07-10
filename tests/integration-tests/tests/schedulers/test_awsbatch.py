@@ -20,10 +20,11 @@ from tests.common.schedulers_common import AWSBatchCommands
 
 @pytest.mark.batch_dockerfile_deps
 @pytest.mark.skip_regions(["ap-northeast-3", "us-gov-east-1", "us-gov-west-1"])
-@pytest.mark.instances(["c5.xlarge", "t2.large", "m6g.xlarge"])
+@pytest.mark.instances(["c5.xlarge", "t2.large", "m6g.xlarge", "r6g.xlarge", "c6g.xlarge", "c5a.xlarge"])
 @pytest.mark.dimensions("*", "*", "alinux", "awsbatch")
 @pytest.mark.dimensions("*", "*", "alinux2", "awsbatch")
 @pytest.mark.usefixtures("region", "os", "instance", "scheduler")
+@pytest.mark.skip_oss(["alinux"])
 def test_awsbatch(pcluster_config_reader, clusters_factory, test_datadir):
     """
     Test all AWS Batch related features.
