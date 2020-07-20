@@ -385,7 +385,7 @@ AVAILABILITY_ZONE_OVERRIDES = {
     # c5.xlarge is not supported in us-east-1e
     # FSx Lustre file system creation is currently not supported for us-east-1e
     # m6g.xlarge is not supported in us-east-1c or us-east-1e
-    "us-east-1": ["us-east-1a", "us-east-1b", "us-east-1d", "us-east-1f"],
+    "us-east-1": ["us-east-1a"],
     # m6g.xlarge is not supported in us-east-2a
     "us-east-2": ["us-east-2b", "us-east-2c"],
     # c4.xlarge is not supported in us-west-2d
@@ -426,7 +426,7 @@ def vpc_stacks(cfn_stacks_factory, request):
         # Randomly select 2 AZs from list WITHOUT replacement, hence the need for [None, None].
         # Creating private_subnet_different_cidr in a different AZ for test_efs
         # To-do: isolate this logic and create a compute subnet in different AZ than master in test_efs
-        availability_zones = random.sample(AVAILABILITY_ZONE_OVERRIDES.get(region, [None, None]), k=2)
+        availability_zones = random.sample(AVAILABILITY_ZONE_OVERRIDES.get(region, [None]), k=1)
         # defining subnets per region to allow AZs override
         public_subnet = SubnetConfig(
             name="Public",
@@ -444,18 +444,19 @@ def vpc_stacks(cfn_stacks_factory, request):
             availability_zone=availability_zones[0],
             default_gateway=Gateways.NAT_GATEWAY,
         )
-        private_subnet_different_cidr = SubnetConfig(
-            name="PrivateAdditionalCidr",
-            cidr="192.168.128.0/17",  # 32766 IPs
-            map_public_ip_on_launch=False,
-            has_nat_gateway=False,
-            availability_zone=availability_zones[1],
-            default_gateway=Gateways.NAT_GATEWAY,
-        )
+        # private_subnet_different_cidr = SubnetConfig(
+        #     name="PrivateAdditionalCidr",
+        #     cidr="192.168.128.0/17",  # 32766 IPs
+        #     map_public_ip_on_launch=False,
+        #     has_nat_gateway=False,
+        #     availability_zone=availability_zones[1],
+        #     default_gateway=Gateways.NAT_GATEWAY,
+        # )
         vpc_config = VPCConfig(
             cidr="192.168.0.0/17",
             additional_cidr_blocks=["192.168.128.0/17"],
-            subnets=[public_subnet, private_subnet, private_subnet_different_cidr],
+            # subnets=[public_subnet, private_subnet, private_subnet_different_cidr],
+            subnets=[public_subnet, private_subnet],
         )
         template = NetworkTemplateBuilder(vpc_configuration=vpc_config, availability_zone=availability_zones[0]).build()
         vpc_stacks[region] = _create_vpc_stack(request, template, region, cfn_stacks_factory)
