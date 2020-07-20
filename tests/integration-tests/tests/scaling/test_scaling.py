@@ -33,9 +33,9 @@ from utils import get_compute_nodes_instance_ids, get_instance_ids_compute_hostn
 @pytest.mark.usefixtures("region", "os", "instance")
 def test_multiple_jobs_submission(scheduler, region, pcluster_config_reader, clusters_factory, test_datadir):
     scaledown_idletime = 4
-    # Test jobs should take at most 9 minutes to be executed.
+    # Test jobs should take at most 13 minutes to be executed.
     # These guarantees that the jobs are executed in parallel.
-    max_jobs_execution_time = 9
+    max_jobs_execution_time = 13
 
     cluster_config = pcluster_config_reader(scaledown_idletime=scaledown_idletime)
     cluster = clusters_factory(cluster_config)
